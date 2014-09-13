@@ -13,6 +13,20 @@ game ends when a line is completed
 
 window.onload = function(){
 
+	var winLines = [
+		// rows
+		[11,21,31],
+		[12,22,32],
+		[13,23,33],
+		// columns
+		[11,12,13],
+		[21,22,23],
+		[31,32,33],
+		// diagonal
+		[11,22,33],
+		[13,22,31]
+	];
+
 	// create container for grid
 	var targetElem = document.querySelector("#gameGrid");
 
@@ -42,7 +56,7 @@ window.onload = function(){
 				if(elem.innerHTML == "") elem.innerHTML = nextSymbol(currentSymbol);
 
 				getIntersectingLines(elem);
-				//checkLines(  );
+
 			})
 		}
 	}
@@ -70,14 +84,16 @@ window.onload = function(){
 	// we only need to check these lines for a winning move
 	function getIntersectingLines(currentCell){
 		// remove first letter from id and convert grid reference to array
-		var target = {};
-			target.x = currentCell.id.substring(1).split("")[0],
-			target.y = currentCell.id.substring(1).split("")[1];
-		
-		// we need to get the ids for each line that intersects this one, each in its own array
-		var lines = [];
+		var target = parseInt(currentCell.id.substring(1), 10),
+			lines = [];
+		// check all winlines for target cell and store in lines array	
+		for(var line in winLines){
+			if(winLines[line].indexOf(target)>-1){
+				lines.push(winLines[line]);
+			}
+		}
 
-		console.log(lines);
+		return lines;
 	}
 
 	function finishGame(){
