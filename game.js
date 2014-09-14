@@ -28,14 +28,14 @@ window.onload = function(){
 	];
 
 	// create container for grid
-	var targetElem = document.querySelector("#gameGrid");
+	var gameGrid = document.querySelector("#gameGrid");
 
 	// track current player by 0 or X
-	var currentSymbol = "0";
+	var currentPlay = "0";
 	// update symbol to be palced for next player
 	function nextSymbol(){
-		currentSymbol = currentSymbol === "0" ? "X" : "0";
-		return currentSymbol;
+		currentPlay = currentPlay === "0" ? "X" : "0";
+		return currentPlay;
 	}
 
 	function drawGrid(x,y){
@@ -43,40 +43,22 @@ window.onload = function(){
 			for(var c=0; c<x; c++){
 				var cell = document.createElement('span');
 				cell.id = "c"+(c+1)+r;
-				targetElem.appendChild(cell);
+				gameGrid.appendChild(cell);
 			}
 		}
 	}
 
-	function bindClicks(targetElem){
-		var cells = targetElem.querySelectorAll('span');
-		for(var i=0; i<cells.length; i++){
-			cells[i].addEventListener('click', function(e){
-				var elem = e.target;
-				if(elem.innerHTML == "") elem.innerHTML = nextSymbol(currentSymbol);
+	function clickHandler(e){
+		var elem = e.target;
+		if(elem.innerHTML == "") elem.innerHTML = nextSymbol(currentPlay);
 
-				getIntersectingLines(elem);
-
-			})
-		}
+		checkWinningLine(elem);
 	}
+	function bindClicks(gameGrid){
+		var cells = gameGrid.querySelectorAll('span');
 
-	// look for winning lines for the last played cell
-	function checkLines(target){
-		// check only intersecting lines for current player
-
-		var cells = targetElem.querySelectorAll('span');
-
-		// check rows
-		if(
-				(
-					cells[1].innerHTML == currentSymbol &&
-					cells[0].innerHTML == currentSymbol &&
-					cells[2].innerHTML == currentSymbol
-				)
-			)
-		{
-			finishGame();
+		for(var i=0; i<cells.length; i++){
+			cells[i].addEventListener('click', clickHandler);
 		}
 	}
 
@@ -96,10 +78,42 @@ window.onload = function(){
 		return lines;
 	}
 
+	// look for winning lines for the last played cell
+	function checkWinningLine(target){
+		// check only intersecting lines for current player
+
+		var lines = getIntersectingLines(target);
+
+		for(var line in lines){
+			var currentLine = lines[line];
+
+			var cell1 = gameGrid.querySelector("#c"+currentLine[0]),
+				cell2 = gameGrid.querySelector("#c"+currentLine[1]),
+				cell3 = gameGrid.querySelector("#c"+currentLine[2]);
+
+			if(
+				cell1.innerHTML == currentPlay &&
+				cell2.innerHTML == currentPlay &&
+				cell3.innerHTML == currentPlay
+			){
+				console.log(currentLine);
+				removeEvents();
+				finishGame(currentLine);
+			}
+		}
+	}
+
+	function removeEvents(){
+		var cells = gameGrid.querySelectorAll('span');
+		for(var i=0; i<cells.length; i++){
+			cells[i].removeEventListener('click', clickHandler);
+		}
+	}
+	
 	function finishGame(){
 		console.log("win");
 	}
 
 	drawGrid(3,3);
-	bindClicks(targetElem);
+	bindClicks(gameGrid);
 }
