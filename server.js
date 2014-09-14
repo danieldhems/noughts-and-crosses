@@ -1,16 +1,22 @@
 var express = require("express"),
-	http = require("http");
-
-var app = express();
-
-app.set("port", process.env.PORT || 3000)
+	app = express(),
+	http = require("http").Server(app),
+	io = require("socket.io")(http);
 
 app.use(express.static(__dirname));
-
 app.get("/", function(req, res){
-	res.sendFile(__dirname + "/game.html");
+	res.sendfile("game.html");
 });
 
-http.createServer(app).listen(app.get("port"), function(){
-	console.log("server running on port " + app.get("port"));
+io.on("connection", function(socket){
+	console.log("a user connection");
+	
+	socket.on("move", function(data){
+		console.log(data);
+		io.emit("move", data);
+	});
+});
+
+http.listen(3000, function(){
+	console.log("server listening on port 3000");
 });

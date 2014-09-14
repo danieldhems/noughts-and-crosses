@@ -18,6 +18,6 @@
   "homepage": "https://github.com/danieldhems/noughts-and-crosses",
   "dependencies": {
     "express": "^4.9.0",
-    "http": "0.0.0"
+    "socket.io": "^1.1.0"
   }
 }

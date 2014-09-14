@@ -13,6 +13,8 @@ game ends when a line is completed
 
 window.onload = function(){
 
+	var socket = io();
+
 	var winLines = [
 		// rows
 		[11,21,31],
@@ -32,7 +34,8 @@ window.onload = function(){
 
 	// track current player by 0 or X
 	var currentPlay = "0";
-	// update symbol to be palced for next player
+
+	// update symbol for next player
 	function nextSymbol(){
 		currentPlay = currentPlay === "0" ? "X" : "0";
 		return currentPlay;
@@ -48,12 +51,30 @@ window.onload = function(){
 		}
 	}
 
+	// handle each play
 	function clickHandler(e){
-		var elem = e.target;
-		if(elem.innerHTML == "") elem.innerHTML = nextSymbol(currentPlay);
+		var elem = e.target,
+			thisCell = getGridRef(elem);
+
+		if(elem.innerHTML == "") elem.innerHTML = currentPlay;
 
 		checkWinningLine(elem);
+
+		var moveData = {
+			symbol: currentPlay,
+			cell: thisCell,
+			winningLine: 
+		};
+
+		socket.emit("move", moveData);
 	}
+
+	// get grid reference from ID of last played cell
+	function getGridRef(elem){
+		return parseInt(elem.id.substring(1), 10);
+	}
+
+	// attach click handler to all cells in game grid
 	function bindClicks(gameGrid){
 		var cells = gameGrid.querySelectorAll('span');
 
@@ -62,12 +83,14 @@ window.onload = function(){
 		}
 	}
 
-	// find lines tat intersect the last click
+	// find lines that intersect the last click
 	// we only need to check these lines for a winning move
 	function getIntersectingLines(currentCell){
+
 		// remove first letter from id and convert grid reference to array
-		var target = parseInt(currentCell.id.substring(1), 10),
+		var target = getGridRef(currentCell),
 			lines = [];
+
 		// check all winlines for target cell and store in lines array	
 		for(var line in winLines){
 			if(winLines[line].indexOf(target)>-1){
@@ -114,6 +137,21 @@ window.onload = function(){
 			document.querySelector("#c"+winningLine[cell]).style.backgroundColor = "green";
 		}
 	}
+
+	function updateGameGrid(move){
+		var cell = gameGrid.querySelector("#c"+move.cell)
+		// update grid with last play from opponent
+		cell.innerHTML = move.symbol;
+		// look for winning line 
+		checkWinningLine(cell);
+	}
+
+	// receive opponent's move and update game
+	socket.on("move", function(data){
+		console.log(data);
+		currentPlay = nextSymbol(data.symbol);
+		updateGameGrid(data);
+	});
 
 	drawGrid(3,3);
 	bindClicks(gameGrid);

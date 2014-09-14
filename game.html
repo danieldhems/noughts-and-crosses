@@ -10,22 +10,23 @@
       <meta name="description" content="">
       <meta name="viewport" content="width=device-width">
       <link rel="stylesheet" href="">
-      <script type="text/javascript" src="game.js"></script>
       <style>
-				span {
-					float:left;
-					display:block;
-					width:50px;
-					height:50px;
-					border:1px solid;
-					font-size:2em;
-				}
-				span:nth-child(3n+1){
-					clear:left;
-				}
+        span {
+          float:left;
+          display:block;
+          width:50px;
+          height:50px;
+          border:1px solid;
+          font-size:2em;
+        }
+        span:nth-child(3n+1){
+          clear:left;
+        }
       </style>
   </head>
   <body>
-		<div id="gameGrid"></div>
+    <div id="gameGrid"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="game.js"></script>
   </body>
 </html>
