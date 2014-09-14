@@ -113,7 +113,6 @@ window.onload = function(){
 		for(var cell in winningLine){
 			document.querySelector("#c"+winningLine[cell]).style.backgroundColor = "green";
 		}
-		console.log("win");
 	}
 
 	drawGrid(3,3);

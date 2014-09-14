@@ -1,0 +1,23 @@
+{
+  "name": "noughts-and-crosses",
+  "version": "0.0.0",
+  "description": "Noughts and crosses game written in JS.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danieldhems/noughts-and-crosses"
+  },
+  "author": "Dan Hems",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danieldhems/noughts-and-crosses/issues"
+  },
+  "homepage": "https://github.com/danieldhems/noughts-and-crosses",
+  "dependencies": {
+    "express": "^4.9.0",
+    "http": "0.0.0"
+  }
+}
