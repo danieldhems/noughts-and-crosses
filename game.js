@@ -96,7 +96,6 @@ window.onload = function(){
 				cell2.innerHTML == currentPlay &&
 				cell3.innerHTML == currentPlay
 			){
-				console.log(currentLine);
 				removeEvents();
 				finishGame(currentLine);
 			}
@@ -109,8 +108,11 @@ window.onload = function(){
 			cells[i].removeEventListener('click', clickHandler);
 		}
 	}
-	
-	function finishGame(){
+
+	function finishGame(winningLine){
+		for(var cell in winningLine){
+			document.querySelector("#c"+winningLine[cell]).style.backgroundColor = "green";
+		}
 		console.log("win");
 	}
 
