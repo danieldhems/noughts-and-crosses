@@ -13,7 +13,45 @@ game ends when a line is completed
 
 window.onload = function(){
 
-	var socket = io();
+	var socket = io(),
+			host = null,
+			hostSymbol = null,
+			guestSymbol = null;
+
+	var username,
+			roomname;
+
+	var gameInfo = document.querySelector("#gameInfo");
+
+	var form = document.forms["gameOptions"];
+
+	form.addEventListener("submit", function(e){
+		e.preventDefault();
+		
+		var username = form.username.value,
+				roomname = form.roomname.value;
+
+		socket.emit("initGame", {
+			username: username,
+			roomname: roomname
+		});
+	});
+
+	socket.on("hostJoin", function(data){
+		var joinText = document.createElement("p").innerHTML;
+
+		hostSymbol = "0";
+		joinText = "You created "+data.roomname;
+
+		console.log(data);
+		gameInfo.appendChild(joinText);
+	});
+
+	socket.on("userJoin", function(data){
+		var joinText = document.createElement("p"),innerHTML;
+		joinText = data.username + " joined";
+		guestSymbol = "X";
+	});
 
 	var winLines = [
 		// rows
@@ -32,15 +70,6 @@ window.onload = function(){
 	// create container for grid
 	var gameGrid = document.querySelector("#gameGrid");
 
-	// track current player by 0 or X
-	var currentPlay = "0";
-
-	// update symbol for next player
-	function nextSymbol(){
-		currentPlay = currentPlay === "0" ? "X" : "0";
-		return currentPlay;
-	}
-
 	function drawGrid(x,y){
 		for(var r=y; r>0; r--){
 			for(var c=0; c<x; c++){
@@ -56,20 +85,19 @@ window.onload = function(){
 		var elem = e.target,
 			thisCell = getGridRef(elem);
 
-		if(elem.innerHTML == "") elem.innerHTML = currentPlay;
+		if(elem.innerHTML == "") elem.innerHTML = playerSymbol;
 
 		checkWinningLine(elem);
 
 		var moveData = {
-			symbol: currentPlay,
-			cell: thisCell,
-			winningLine: 
+			cell: thisCell
 		};
 
 		socket.emit("move", moveData);
 	}
 
 	// get grid reference from ID of last played cell
+	// @return two-digit Number
 	function getGridRef(elem){
 		return parseInt(elem.id.substring(1), 10);
 	}
@@ -114,10 +142,11 @@ window.onload = function(){
 				cell2 = gameGrid.querySelector("#c"+currentLine[1]),
 				cell3 = gameGrid.querySelector("#c"+currentLine[2]);
 
+
 			if(
-				cell1.innerHTML == currentPlay &&
-				cell2.innerHTML == currentPlay &&
-				cell3.innerHTML == currentPlay
+				cell1.innerHTML == playerSymbol &&
+				cell2.innerHTML == playerSymbol &&
+				cell3.innerHTML == playerSymbol
 			){
 				removeEvents();
 				finishGame(currentLine);
@@ -139,9 +168,10 @@ window.onload = function(){
 	}
 
 	function updateGameGrid(move){
+		console.log(opponentSymbol);
 		var cell = gameGrid.querySelector("#c"+move.cell)
 		// update grid with last play from opponent
-		cell.innerHTML = move.symbol;
+		cell.innerHTML = opponentSymbol;
 		// look for winning line 
 		checkWinningLine(cell);
 	}
@@ -149,7 +179,6 @@ window.onload = function(){
 	// receive opponent's move and update game
 	socket.on("move", function(data){
 		console.log(data);
-		currentPlay = nextSymbol(data.symbol);
 		updateGameGrid(data);
 	});
 
